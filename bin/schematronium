@@ -1,0 +1,51 @@
+#!/bin/env jruby
+require 'schematronium'
+
+raise "Not enough arguments" if ARGV.length < 2
+
+as_checker = Schematronium.new(ARGV.shift)
+
+@fnames = []
+
+if ARGV.empty?
+  @fnames = @fnames + Dir[File.join('.', "*.xml")]
+else
+  ARGV.each do |arg|
+    # Because absolute_path doesn't work right? Investigate
+    arg = arg.sub(/~/, Dir.home)
+
+    @fnames += case File.absolute_path(arg)
+               when File.method(:directory?).to_proc
+                 Dir[File.join(File.absolute_path(arg), "*.xml")]
+               when File.method(:file?).to_proc
+                 [File.absolute_path(arg)]
+               else
+                 []
+               end
+  end
+end
+
+@file_errors = {}
+
+@fnames.each do |f|
+  $stderr.write "Processing '#{f}'..."
+  xml = as_checker.check(File.read(f))
+
+  @file_errors[f] = xml.reduce({}) do |res, err|
+    msg = err.element_children.first.text.lstrip.gsub(/\s+/, ' ')
+    errs = res[msg] || []
+    errs << err.attributes.map do |k, v|
+      [k.to_s, v.to_s]
+    end.to_h
+    res[msg] = errs
+    res
+  end
+
+  $stderr.write " Finished\n"
+end
+
+puts @file_errors.reject {|k,v|
+  v.empty?
+}.map {|k,v|
+  [k, v.map {|k, v| [k, v.count]}.to_h]
+}.to_h
