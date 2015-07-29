@@ -1,4 +1,5 @@
-#!/bin/env jruby
+#!/usr/bin/env jruby
+$LOAD_PATH.unshift(File.expand_path('./lib'))
 require 'schematronium'
 
 raise "Not enough arguments" if ARGV.length < 2
@@ -31,21 +32,23 @@ end
   $stderr.write "Processing '#{f}'..."
   xml = as_checker.check(File.read(f))
 
-  @file_errors[f] = xml.reduce({}) do |res, err|
-    msg = err.element_children.first.text.lstrip.gsub(/\s+/, ' ')
-    errs = res[msg] || []
-    errs << err.attributes.map do |k, v|
-      [k.to_s, v.to_s]
-    end.to_h
-    res[msg] = errs
-    res
-  end
+  @file_errors[f] = xml
 
   $stderr.write " Finished\n"
 end
 
-puts @file_errors.reject {|k,v|
-  v.empty?
-}.map {|k,v|
-  [k, v.map {|k, v| [k, v.count]}.to_h]
-}.to_h
+
+@output = Nokogiri::XML::Document.new
+@root = @output.add_child("<files />")
+@file_errors.each {|k,v|
+  file = @root.add_child("<file id='#{k}' total_errors='#{v.count}'/>").first
+  counts = v.group_by {|el| el.children.map(&:text).join.strip.gsub(/\s+/, ' ')}.map {|k,v| [k,v.count]}.to_h
+  err_count = file.add_child("<error_counts />").first
+  counts.each do |k,v|
+    err_count.add_child("<message count='#{v}'>#{k}</message>")
+  end
+  errs = file.add_child("<errors />").first
+  errs.children = v
+}
+
+puts @output

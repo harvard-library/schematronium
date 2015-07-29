@@ -1,5 +1,3 @@
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-puts $LOAD_PATH
 require 'schematronium'
 require 'minitest'
 require 'minitest/pride'
