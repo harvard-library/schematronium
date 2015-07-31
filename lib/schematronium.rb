@@ -3,14 +3,13 @@ require 'nokogiri' # Used for output parsing - there doesn't seem to be a clean 
 
 class Schematronium
   def iso_file(fname)
-    File.open(File.join(File.dirname(File.expand_path(__FILE__)), 'iso-schematron-xslt2', fname))
+    Saxon.XSLT(File.open(File.join(File.dirname(File.expand_path(__FILE__)), 'iso-schematron-xslt2', fname)))
   end
 
   def initialize(schematron)
-
-    dsdl = Saxon.XSLT(iso_file('iso_dsdl_include.xsl'))
-    abstract = Saxon.XSLT(iso_file('iso_abstract_expand.xsl'))
-    sc_compile = Saxon.XSLT(iso_file('iso_svrl_for_xslt2.xsl'))
+    stages = %w|iso_dsdl_include.xsl
+                iso_abstract_expand.xsl
+                iso_svrl_for_xslt2.xsl|.map{|s| iso_file s}
 
     schematron = case schematron
                  when IO
@@ -23,10 +22,11 @@ class Schematronium
                    end
                  end
 
-
-
-
-    @sch_script = Saxon.XSLT(sc_compile.transform(abstract.transform(dsdl.transform(schematron))).to_s)
+    @sch_script = Saxon.XSLT(
+      stages.reduce(schematron) do |result, stage|
+        stage.transform(result)
+      end.to_s
+    )
   end
 
   def check(xml)
