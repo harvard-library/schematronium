@@ -36,7 +36,5 @@ class Schematronium
   # Run schematron over xml document, returning NodeSet of errors
   def check(xml)
     xml = Nokogiri::XML(@sch_script.transform( Saxon.XML(xml)).to_s)
-    xml.remove_namespaces!
-    xml.xpath("//failed-assert")
   end
 end

@@ -9,11 +9,11 @@ class SchematroniumTest < MiniTest::Test
   end
 
   def setup
-    @stron = Schematronium.new(td('schematron', 'as_schematron.sch'))
+    @stron = Schematronium.new(td('schematron', 'test.sch'))
   end
 
   def test_check_with_file
-    @stron.check(File.open(td('xml', 'div01000.xml')))
+    @stron.check(File.open(td('xml', 'test.xml')))
   end
 
 end

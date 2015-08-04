@@ -30,6 +30,9 @@ puts '<?xml version="1.0" encoding="UTF-8"?><files>'
 @fnames.each do |f|
   $stderr.write "Processing '#{f}'..."
   xml = as_checker.check(File.read(f))
+  xml.remove_namespaces!
+  xml = xml.xpath("//failed-assert")
+
   output = Nokogiri::XML::DocumentFragment.new(Nokogiri::XML::Document.new)
 
   file = output.add_child("<file id='#{f}' total_errors='#{xml.count}'/>").first
