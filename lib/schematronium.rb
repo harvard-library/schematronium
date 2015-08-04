@@ -33,7 +33,7 @@ class Schematronium
     )
   end
 
-  # Run schematron over xml document, returning NodeSet of errors
+  # Run schematron over xml document, returning the resulting XML
   def check(xml)
     xml = Nokogiri::XML(@sch_script.transform( Saxon.XML(xml)).to_s)
   end

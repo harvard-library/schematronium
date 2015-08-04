@@ -4,7 +4,7 @@
     <testable test-attr="pass" />
   </test>
   <test>
-    <testable />
+    <testable id="test1" />
   </test>
   <test/>
 </tests>

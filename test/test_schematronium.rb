@@ -13,7 +13,10 @@ class SchematroniumTest < MiniTest::Test
   end
 
   def test_check_with_file
-    @stron.check(File.open(td('xml', 'test.xml')))
+    results = @stron.check(File.open(td('xml', 'test.xml')))
+    results.remove_namespaces!
+    assert_equal 1, results.xpath("//failed-assert").count, "Expects one failure"
+    assert_equal 2, results.xpath("//successful-report").count, "Expects two reports"
   end
 
 end

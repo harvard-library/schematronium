@@ -2,8 +2,9 @@
 <schema xmlns="http://purl.oclc.org/dsdl/schematron" queryBinding="xslt2">
   <pattern>
     <rule context="*:test">
-      <report >
-      <assert test="*:testable">One or more 'testables' must exist in any 'test' element.</assert>
+      <report test="*:testable">
+        There should be 'testable' elements within 'test's.
+      </report>
     </rule>
     <rule context="*:test/*:testable">
       <assert test="@test-attr">Testables must have have the 'test-attr' attribute.</assert>
