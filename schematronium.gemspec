@@ -17,7 +17,7 @@ Gem::Specification.new do |gem|
   gem.license = 'GPLv3'
 
   # Runtime dependencies
-  gem.add_runtime_dependency "saxon-xslt", '~> 0.5.1'
+  gem.add_runtime_dependency "saxon-xslt", '~> 0.5'
   gem.add_runtime_dependency "nokogiri", '~> 1.6'
 
   gem.add_development_dependency "rake", '~> 10.4'
