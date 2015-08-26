@@ -4,7 +4,9 @@ require 'schematronium'
 
 raise "Not enough arguments" if ARGV.length < 2
 
-as_checker = Schematronium.new(ARGV.shift)
+Saxon::Processor.default.config[:line_numbering] = true
+
+stron = Schematronium.new(ARGV.shift)
 
 @fnames = []
 
@@ -29,13 +31,18 @@ end
 puts '<?xml version="1.0" encoding="UTF-8"?><files>'
 @fnames.each do |f|
   $stderr.write "Processing '#{f}'..."
-  xml = as_checker.check(File.read(f))
+  s_xml = Saxon.XML(File.open(f))
+  xml = stron.check(s_xml)
   xml.remove_namespaces!
-  xml = xml.xpath("//failed-assert") + xml.xpath("//successful-report")
+
+  xml = xml.xpath("//*[self::failed-assert or self::successful-report]")
+  xml.each do |el|
+    el["line-number"] = s_xml.xpath(el.attr("location")).get_line_number
+  end
   output = Nokogiri::XML::DocumentFragment.new(Nokogiri::XML::Document.new)
 
   file = output.add_child("<file id='#{f}' total_errors='#{xml.count}'/>").first
-  counts = xml.group_by {|el| el.children.map(&:text).join.strip.gsub(/\s+/, ' ')}.map {|k,v| [k,v.count]}.to_h
+  counts = xml.group_by {|el| el.children.map(&:text).join.strip.gsub(/\s+/, ' ')}.reduce({}) {|res, (k,v)| res[k] = v.count; res}
   err_count = file.add_child("<error_counts />").first
   counts.each do |k,v|
     err_count.add_child("<message count='#{v}'>#{k}</message>")
