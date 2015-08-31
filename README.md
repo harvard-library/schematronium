@@ -16,6 +16,8 @@ The goals of Schematronium are very similar to [schematron-wrapper](https://gith
 
 ## API
 
+API docs are hosted [here](http://www.rubydoc.info/github/harvard-library/schematronium/master).
+
 The API for Schematronium is very, very minimal.
 
 ```Ruby
