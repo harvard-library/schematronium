@@ -7,7 +7,9 @@ class Schematronium
   #
   # @param [String, IO, File] schematron A schematron document, as either an IO object responding to #read,
   #   a filename, or a [String]
-  def initialize(schematron)
+  # @param [String] phase The name of the schematron phase to run. By default, the
+  #   special "run everything" phase is run
+  def initialize(schematron, phase="'#ALL'")
     stages = %w|iso_dsdl_include.xsl
                 iso_abstract_expand.xsl
                 iso_svrl_for_xslt2.xsl|.map{|s| iso_file s}
@@ -26,11 +28,11 @@ class Schematronium
     # Run schematron through each stage of the iso_schematron pipeline
     #    then stringify the final result because Saxon.XSLT can't take
     #    an XML doc as input
-    @sch_script = Saxon.XSLT(
-      stages.reduce(schematron) do |result, stage|
-        stage.transform(result)
-      end.to_s
-    )
+    @sch_script = stages[0].transform(schematron)
+    @sch_script = stages[1].transform(@sch_script)
+    @sch_script = stages[2].transform(@sch_script, 'phase' => phase)
+
+    @sch_script = Saxon::XSLT(@sch_script.to_s)
   end
 
   # Run schematron over xml document, returning the resulting XML
