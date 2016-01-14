@@ -14,15 +14,16 @@ class Schematronium
                 iso_abstract_expand.xsl
                 iso_svrl_for_xslt2.xsl|.map{|s| iso_file s}
 
-    schematron = case schematron
-                 when IO
+    schematron = if schematron.responds_to? :read
                    Saxon.XML(schematron.read)
-                 when String
+                 elsif schematron.kind_of? String
                    if File.file? schematron
                      Saxon.XML(File.open(schematron))
                    else
                      Saxon.XML(schematron)
                    end
+                 else
+                   raise "Unable to generate Schematron document from #{schematron.class.to_s}"
                  end
 
     # Run schematron through each stage of the iso_schematron pipeline

@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name = 'schematronium'
-  gem.version = '0.1.1'
+  gem.version = '0.1.2'
   gem.date = '2015-07-27'
   gem.summary = 'Tool for running schematron against XML strings/files'
   gem.description = 'Wraps the saxon-xslt wrapper for Saxon 9 HE, providing a simple (one function) interface for running a schematron against an XML string or file'
@@ -21,6 +21,5 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency "nokogiri", '~> 1.6'
 
   gem.add_development_dependency "rake", '~> 10.4'
-  gem.add_development_dependency "minitest"
 
 end

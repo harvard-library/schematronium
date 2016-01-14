@@ -6,6 +6,14 @@ raise "Not enough arguments" if ARGV.length < 2
 
 Saxon::Processor.default.config[:line_numbering] = true
 
+# Disable a bunch of stuff in parser to prevent XXE vulnerabilities
+parser_options = Saxon::Processor.default.to_java.getUnderlyingConfiguration.parseOptions
+parser_options.add_parser_feature("http://apache.org/xml/features/disallow-doctype-decl", true)
+parser_options.add_parser_feature("http://xml.org/sax/features/external-general-entities", false)
+parser_options.add_parser_feature("http://xml.org/sax/features/external-parameter-entities", false)
+
+
+
 stron = Schematronium.new(ARGV.shift)
 
 @fnames = []
@@ -14,14 +22,11 @@ if ARGV.empty?
   @fnames = @fnames + Dir[File.join('.', "*.xml")]
 else
   ARGV.each do |arg|
-    # Because absolute_path doesn't work right? Investigate
-    arg = arg.sub(/~/, Dir.home)
-
-    @fnames += case File.absolute_path(arg)
+    @fnames += case File.expand_path(arg)
                when File.method(:directory?).to_proc
-                 Dir[File.join(File.absolute_path(arg), "*.xml")]
+                 Dir[File.join(File.expand_path(arg), "*.xml")]
                when File.method(:file?).to_proc
-                 [File.absolute_path(arg)]
+                 [File.expand_path(arg)]
                else
                  []
                end
@@ -35,7 +40,7 @@ puts '<?xml version="1.0" encoding="UTF-8"?><files>'
   xml = stron.check(s_xml)
   xml.remove_namespaces!
 
-  xml = xml.xpath("//*[self::failed-assert or self::successful-report]")
+  xml = xml.xpath("//failed-assert|//successful-report")
   xml.each do |el|
     el["line-number"] = s_xml.xpath(el.attr("location")).get_line_number
   end

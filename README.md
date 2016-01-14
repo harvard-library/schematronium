@@ -3,7 +3,7 @@
 Schematronium is a gem providing:
 
 1. A single-object, single-function API for compiling a [schematron](http://www.schematron.com/) script, and running it over an XML file, returning a [Nokogiri](Nokogiri.org) [NodeSet](http://www.rubydoc.info/github/sparklemotion/nokogiri/Nokogiri/XML/NodeSet) of the resulting `failed-assert`s and `successful-report`s.
-2. A script ([schematronium](bin/schematronium)) to run a schematron over one or many XML files and return aggregate date in a TBD format. Mostly meant as an example of something you could to with it.
+2. A script ([schematronium](bin/schematronium)) to run a schematron over one or many XML files and return aggregate date in a TBD format. Mostly meant as an example of something you could to with it. Also shows how to turn off some parser features to prevent XXE vulnerabilities, which is VERY IMPORTANT if you are parsing XML you do not personally 100% control.  Schematronium does NOT do this by default.
 
 The goals of Schematronium are very similar to [schematron-wrapper](https://github.com/Agilefreaks/schematron-wrapper).  The primary difference is that, where schematron-wrapper runs the saxon jar via backticks per file, Schematronium uses the jRuby-only [saxon-xslt](https://github.com/fidothe/saxon-xslt) library to compile and run the schematron.  This has the upshot of not incurring the penalty of JDK initialization per file, which tends to be a substantial cost savings over even a small number of files.
 
