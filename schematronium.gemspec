@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name = 'schematronium'
-  gem.version = '0.1.2'
+  gem.version = '0.1.3'
   gem.date = '2015-07-27'
   gem.summary = 'Tool for running schematron against XML strings/files'
   gem.description = 'Wraps the saxon-xslt wrapper for Saxon 9 HE, providing a simple (one function) interface for running a schematron against an XML string or file'
