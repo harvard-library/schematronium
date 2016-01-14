@@ -14,7 +14,7 @@ class Schematronium
                 iso_abstract_expand.xsl
                 iso_svrl_for_xslt2.xsl|.map{|s| iso_file s}
 
-    schematron = if schematron.responds_to? :read
+    schematron = if schematron.respond_to? :read
                    Saxon.XML(schematron.read)
                  elsif schematron.kind_of? String
                    if File.file? schematron
